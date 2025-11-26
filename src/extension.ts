@@ -5,7 +5,8 @@ import * as fs from 'fs';
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('cp-supports.openCaseFirst', openCaseFirst),
-    vscode.commands.registerCommand('cp-supports.openCase', openCase)
+    vscode.commands.registerCommand('cp-supports.openCase', openCase),
+    vscode.commands.registerCommand('cp-supports.openCPFiles', openCPFiles)
   );
 }
 
@@ -97,6 +98,42 @@ async function openCase() {
     await vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup');
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to open test files: ${error}`);
+  }
+}
+
+async function openCPFiles(uri: vscode.Uri) {
+  const folderPath = uri.fsPath;
+
+  const mainFile = path.join(folderPath, 'src', 'main.cpp');
+  const inputFile = path.join(folderPath, 'test', 'sample-1.in');
+  const outputFile = path.join(folderPath, 'test', 'sample-1.out');
+
+  try {
+    // Close all open editors
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
+    // Set up editor layout: left half + right half split into top/bottom
+    await vscode.commands.executeCommand('vscode.setEditorLayout', {
+      orientation: 0,
+      groups: [{ size: 0.5 }, { size: 0.5, groups: [{}, {}] }],
+    });
+
+    // Open main.cpp in first window
+    const mainDoc = await vscode.workspace.openTextDocument(mainFile);
+    await vscode.window.showTextDocument(mainDoc, vscode.ViewColumn.One);
+
+    // Open sample-1.in in second window
+    const inputDoc = await vscode.workspace.openTextDocument(inputFile);
+    await vscode.window.showTextDocument(inputDoc, vscode.ViewColumn.Two);
+
+    // Open sample-1.out in third window
+    const outputDoc = await vscode.workspace.openTextDocument(outputFile);
+    await vscode.window.showTextDocument(outputDoc, vscode.ViewColumn.Three);
+
+    // Focus back to first column
+    await vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup');
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to open CP files: ${error}`);
   }
 }
 

@@ -2,7 +2,7 @@
   "name": "cp-supports",
   "displayName": "CP Supports",
   "description": "Competitive Programming support tools for VSCode",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/yukio-goto/cp_supports"
@@ -24,8 +24,21 @@
       {
         "command": "cp-supports.openCase",
         "title": "Open Test Case"
+      },
+      {
+        "command": "cp-supports.openCPFiles",
+        "title": "Open CP Files"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "cp-supports.openCPFiles",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
