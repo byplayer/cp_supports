@@ -28,6 +28,10 @@
       {
         "command": "cp-supports.openCPFiles",
         "title": "Open CP Files"
+      },
+      {
+        "command": "cp-supports.createTestCases",
+        "title": "Create Test Cases"
       }
     ],
     "menus": {
@@ -35,6 +39,11 @@
         {
           "command": "cp-supports.openCPFiles",
           "when": "explorerResourceIsFolder",
+          "group": "navigation"
+        },
+        {
+          "command": "cp-supports.createTestCases",
+          "when": "explorerResourceIsFolder && resourceFilename == test",
           "group": "navigation"
         }
       ]

@@ -6,7 +6,8 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('cp-supports.openCaseFirst', openCaseFirst),
     vscode.commands.registerCommand('cp-supports.openCase', openCase),
-    vscode.commands.registerCommand('cp-supports.openCPFiles', openCPFiles)
+    vscode.commands.registerCommand('cp-supports.openCPFiles', openCPFiles),
+    vscode.commands.registerCommand('cp-supports.createTestCases', createTestCases)
   );
 }
 
@@ -134,6 +135,48 @@ async function openCPFiles(uri: vscode.Uri) {
     await vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup');
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to open CP files: ${error}`);
+  }
+}
+
+async function createTestCases(uri: vscode.Uri) {
+  const testFolderPath = uri.fsPath;
+
+  const input = await vscode.window.showInputBox({
+    prompt: 'Enter test case number',
+    placeHolder: 'e.g., 1, 2, 3...',
+    validateInput: (value) => {
+      const num = parseInt(value, 10);
+      if (isNaN(num) || num <= 0) {
+        return 'Please enter a valid positive number';
+      }
+      return null;
+    },
+  });
+
+  if (!input) {
+    return;
+  }
+
+  const caseNumber = parseInt(input, 10);
+  const inputFile = path.join(testFolderPath, `sample-${caseNumber}.in`);
+  const outputFile = path.join(testFolderPath, `sample-${caseNumber}.out`);
+
+  try {
+    if (!fs.existsSync(inputFile)) {
+      fs.writeFileSync(inputFile, '', 'utf8');
+    }
+
+    if (!fs.existsSync(outputFile)) {
+      fs.writeFileSync(outputFile, '', 'utf8');
+    }
+
+    const inputDoc = await vscode.workspace.openTextDocument(inputFile);
+    await vscode.window.showTextDocument(inputDoc, vscode.ViewColumn.Two);
+
+    const outputDoc = await vscode.workspace.openTextDocument(outputFile);
+    await vscode.window.showTextDocument(outputDoc, vscode.ViewColumn.Three);
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to create test case files: ${error}`);
   }
 }
 
